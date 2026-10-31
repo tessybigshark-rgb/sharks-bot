@@ -1,68 +1,43 @@
-import cors from 'cors';
-import express, { type Request, type Response } from 'express';
-import path from 'node:path';
+import { Router, type Request, type Response } from 'express';
 
-import { envConfig } from './config/env';
+import { generateAIInsight } from './services/aiService';
+import { getDashboardSummary } from './services/analyticsService';
 import { generateMusicBrief } from './services/musicService';
 import { generateSocialCampaign } from './services/socialMediaService';
 import { getRevenueIdeas } from './services/revenueService';
 import { searchSpotifyTracks } from './services/spotifyService';
 import { handleIncomingWhatsAppMessage } from './services/whatsappService';
 
-const app = express();
-const publicDir = path.join(__dirname, '..', 'public');
+const router = Router();
 
-app.use(cors());
-app.use(express.json({ limit: '1mb' }));
-app.use(express.static(publicDir));
-
-app.get('/health', (_req: Request, res: Response) => {
-  res.json({
-    ok: true,
-    app: envConfig.APP_NAME,
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-  });
+router.get('/health', (_req: Request, res: Response) => {
+  res.json({ ok: true, status: 'healthy', app: 'Sharks Bot' });
 });
 
-app.get('/api/dashboard/summary', (_req: Request, res: Response) => {
-  res.json({
-    app: envConfig.APP_NAME,
-    stats: {
-      musicCampaigns: 18,
-      activePlaylists: 12,
-      socialPosts: 63,
-      revenueStreams: 5,
-    },
-    status: 'ready',
-  });
+router.get('/dashboard/summary', (_req: Request, res: Response) => {
+  res.json({ success: true, data: getDashboardSummary() });
 });
 
-app.get('/', (_req: Request, res: Response) => {
-  res.sendFile(path.join(publicDir, 'index.html'));
-});
-
-app.post('/api/music/generate', (req: Request, res: Response) => {
-  const payload = req.body ?? {};
-  const result = generateMusicBrief(payload);
+router.post('/music/generate', (req: Request, res: Response) => {
+  const result = generateMusicBrief(req.body ?? {});
   res.json({ success: true, data: result });
 });
 
-app.post('/api/social/generate', (req: Request, res: Response) => {
-  const payload = req.body ?? {};
-  const result = generateSocialCampaign(payload);
+router.post('/social/generate', (req: Request, res: Response) => {
+  const result = generateSocialCampaign(req.body ?? {});
   res.json({ success: true, data: result });
 });
 
-app.post('/api/spotify/search', async (req: Request, res: Response) => {
+router.post('/spotify/search', async (req: Request, res: Response) => {
   const payload = req.body ?? {};
-  const seedGenres = Array.isArray(payload.seedGenres) ? payload.seedGenres : ['afrobeats', 'dancehall'];
-  const limit = Number(payload.limit ?? 5);
-  const tracks = await searchSpotifyTracks(seedGenres, limit);
+  const tracks = await searchSpotifyTracks(
+    Array.isArray(payload.seedGenres) ? payload.seedGenres : ['afrobeats', 'dancehall'],
+    Number(payload.limit ?? 5),
+  );
   res.json({ success: true, data: tracks });
 });
 
-app.post('/api/whatsapp/webhook', (req: Request, res: Response) => {
+router.post('/whatsapp/webhook', (req: Request, res: Response) => {
   const payload = req.body ?? {};
   const result = handleIncomingWhatsAppMessage({
     message: payload.message ?? '',
@@ -71,10 +46,14 @@ app.post('/api/whatsapp/webhook', (req: Request, res: Response) => {
   res.json({ success: true, data: result });
 });
 
-app.get('/api/revenue/ideas', (_req: Request, res: Response) => {
+router.get('/revenue/ideas', (_req: Request, res: Response) => {
   res.json({ success: true, data: getRevenueIdeas() });
 });
 
-app.listen(envConfig.PORT, () => {
-  console.log(`${envConfig.APP_NAME} running on http://localhost:${envConfig.PORT}`);
+router.post('/ai/insight', async (req: Request, res: Response) => {
+  const prompt = typeof req.body?.prompt === 'string' ? req.body.prompt : 'Create a growth strategy for my music brand.';
+  const result = await generateAIInsight(prompt);
+  res.json({ success: true, data: result });
 });
+
+export default router;

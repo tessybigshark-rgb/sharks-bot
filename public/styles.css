@@ -7,61 +7,81 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <div class="container">
-      <header class="hero">
-        <div>
-          <p class="eyebrow">AI MUSIC + CONTENT COMMAND CENTER</p>
-          <h1>Sharks Bot</h1>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-block">
+          <div class="brand-mark">S</div>
+          <div>
+            <p class="eyebrow">Music + Growth</p>
+            <h2>Sharks Bot</h2>
+          </div>
         </div>
-        <button id="refreshSummary">Refresh summary</button>
-      </header>
 
-      <section id="summary" class="summary-grid"></section>
+        <nav>
+          <a class="nav-item active" href="#">Dashboard</a>
+          <a class="nav-item" href="#">Music Studio</a>
+          <a class="nav-item" href="#">Campaigns</a>
+          <a class="nav-item" href="#">WhatsApp</a>
+          <a class="nav-item" href="#">Revenue</a>
+        </nav>
+      </aside>
 
-      <main class="grid">
-        <section class="card">
-          <h2>Generate music brief</h2>
-          <form id="musicForm">
-            <input name="genre" placeholder="Genre" value="Afrobeats" />
-            <input name="mood" placeholder="Mood" value="happy" />
-            <input name="bpm" type="number" placeholder="BPM" value="110" />
-            <input name="audience" placeholder="Audience" value="young creators" />
-            <input name="usage" placeholder="Usage" value="opening track" />
-            <button type="submit">Generate</button>
-          </form>
-          <pre id="musicResult"></pre>
-        </section>
+      <main class="main-panel">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Creator operating system</p>
+            <h1>AI music and growth dashboard</h1>
+          </div>
+          <button id="refreshSummary">Refresh</button>
+        </header>
 
-        <section class="card">
-          <h2>Generate social campaign</h2>
-          <form id="socialForm">
-            <input name="artistName" placeholder="Artist name" value="Sharks" />
-            <input name="songTitle" placeholder="Song title" value="Night Signal" />
-            <input name="platform" placeholder="Platform" value="Instagram" />
-            <input name="tone" placeholder="Tone" value="confident" />
-            <button type="submit">Generate campaign</button>
-          </form>
-          <pre id="socialResult"></pre>
-        </section>
+        <section id="summary" class="summary-grid"></section>
 
-        <section class="card">
-          <h2>WhatsApp assistant</h2>
-          <form id="whatsappForm">
-            <input name="senderName" placeholder="Sender name" value="Kofi" />
-            <textarea name="message" rows="4" placeholder="Message">Create a playlist for a late-night drive</textarea>
-            <button type="submit">Send message</button>
-          </form>
-          <pre id="whatsappResult"></pre>
-        </section>
+        <section class="forms-grid">
+          <article class="card">
+            <h3>Generate music brief</h3>
+            <form id="musicForm">
+              <input name="genre" value="Afrobeats" />
+              <input name="mood" value="happy" />
+              <input name="bpm" type="number" value="110" />
+              <input name="audience" value="young creators" />
+              <input name="usage" value="opening track" />
+              <button type="submit">Generate</button>
+            </form>
+            <pre id="musicResult"></pre>
+          </article>
 
-        <section class="card">
-          <h2>Spotify recommendations</h2>
-          <form id="spotifyForm">
-            <input name="seedGenres" placeholder="Genres comma-separated" value="afrobeats,dancehall" />
-            <input name="limit" type="number" placeholder="Limit" value="3" />
-            <button type="submit">Search</button>
-          </form>
-          <pre id="spotifyResult"></pre>
+          <article class="card">
+            <h3>Generate social campaign</h3>
+            <form id="socialForm">
+              <input name="artistName" value="Sharks" />
+              <input name="songTitle" value="Night Signal" />
+              <input name="platform" value="Instagram" />
+              <input name="tone" value="confident" />
+              <button type="submit">Generate</button>
+            </form>
+            <pre id="socialResult"></pre>
+          </article>
+
+          <article class="card">
+            <h3>WhatsApp assistant</h3>
+            <form id="whatsappForm">
+              <input name="senderName" value="Kofi" />
+              <textarea name="message" rows="4">Create a playlist for a late-night drive</textarea>
+              <button type="submit">Send</button>
+            </form>
+            <pre id="whatsappResult"></pre>
+          </article>
+
+          <article class="card">
+            <h3>Spotify recommendations</h3>
+            <form id="spotifyForm">
+              <input name="seedGenres" value="afrobeats,dancehall" />
+              <input name="limit" type="number" value="3" />
+              <button type="submit">Search</button>
+            </form>
+            <pre id="spotifyResult"></pre>
+          </article>
         </section>
       </main>
     </div>
