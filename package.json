@@ -1,0 +1,91 @@
+# Sharks Bot
+
+Sharks Bot is an AI-powered music, social media, and revenue automation starter for creators, artists, and digital brands. It combines WhatsApp messaging, Spotify-style recommendations, AI social content creation, and monetization planning in a single platform.
+
+## Features
+- AI music prompt and playlist generation
+- WhatsApp message handling for music and content requests
+- Spotify recommendation layer with mock fallback
+- Social media content generator for Instagram, TikTok, X, and YouTube Shorts
+- Revenue planning ideas for subscriptions, affiliate deals, and brand packages
+- Dashboard summary endpoint and app health endpoint
+
+## Tech stack
+- Node.js
+- TypeScript
+- Express
+- Spotify Web API integration
+- OpenAI-ready service layer
+- Twilio WhatsApp-ready logic
+
+## Quick start
+
+1. Install dependencies:
+   npm install
+
+2. Copy environment variables:
+   cp .env.example .env
+
+3. Fill in the values you want to use.
+
+4. Start the dev server:
+   npm run dev
+
+5. Open the app:
+   http://localhost:4000
+
+## API overview
+
+- GET /health
+- GET /
+- POST /api/music/generate
+- POST /api/social/generate
+- POST /api/whatsapp/webhook
+- GET /api/revenue/ideas
+- POST /api/spotify/search
+
+## Example requests
+
+Generate a music brief:
+
+```bash
+curl -X POST http://localhost:4000/api/music/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "genre": "Afrobeats",
+    "mood": "happy",
+    "bpm": 110,
+    "audience": "young creators",
+    "usage": "opening track"
+  }'
+```
+
+Generate social content:
+
+```bash
+curl -X POST http://localhost:4000/api/social/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "artistName": "Sharks",
+    "songTitle": "Night Signal",
+    "platform": "Instagram",
+    "tone": "confident"
+  }'
+```
+
+Send a WhatsApp-style message:
+
+```bash
+curl -X POST http://localhost:4000/api/whatsapp/webhook \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Create a playlist for a late-night drive",
+    "senderName": "Kofi"
+  }'
+```
+
+## Notes
+This project is intentionally structured as a production-friendly starter. The integrations are implemented as service layers with mock fallback logic so the app works even before real API keys are configured.
+
+## License
+MIT
