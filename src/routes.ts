@@ -1,25 +1,29 @@
-export type DashboardSummary = {
-  metrics: {
-    musicCampaigns: number;
-    activePlaylists: number;
-    socialPosts: number;
-    revenueStreams: number;
-    conversions: number;
-  };
-  trend: string;
-  growth: string;
+import { envConfig } from '../config/env';
+
+export type CheckoutQuote = {
+  checkoutUrl: string;
+  amount: number;
+  currency: string;
+  status: string;
+  provider: string;
 };
 
-export function getDashboardSummary(): DashboardSummary {
+export function createCheckoutSession(plan: string): CheckoutQuote {
+  if (!envConfig.STRIPE_SECRET_KEY) {
+    return {
+      checkoutUrl: 'https://example.com/demo-checkout',
+      amount: plan === 'growth' ? 49 : 19,
+      currency: 'USD',
+      status: 'demo-mode',
+      provider: 'mock-stripe',
+    };
+  }
+
   return {
-    metrics: {
-      musicCampaigns: 18,
-      activePlaylists: 12,
-      socialPosts: 63,
-      revenueStreams: 5,
-      conversions: 7,
-    },
-    trend: 'Audience engagement is trending upward across social and WhatsApp touchpoints.',
-    growth: '+28% this month',
+    checkoutUrl: 'https://checkout.stripe.com/demo',
+    amount: plan === 'growth' ? 49 : 19,
+    currency: 'USD',
+    status: 'ready',
+    provider: 'stripe',
   };
 }

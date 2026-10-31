@@ -25,7 +25,7 @@ body {
   min-height: 100vh;
 }
 
-button, input, textarea {
+button, input, textarea, select {
   font: inherit;
 }
 
@@ -69,7 +69,7 @@ button, input, textarea {
   font-weight: 700;
 }
 
-.sidebar h2, .topbar h1, .card h3 {
+.sidebar h2, .topbar h1, .card h3, .auth-box h4 {
   margin: 0;
 }
 
@@ -91,6 +91,22 @@ nav {
 .nav-item.active {
   background: rgba(117, 169, 255, 0.12);
   border-color: rgba(117, 169, 255, 0.35);
+}
+
+.auth-box {
+  margin-top: 28px;
+  display: grid;
+  gap: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.status-text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .main-panel {
@@ -163,13 +179,17 @@ button {
   margin-bottom: 14px;
 }
 
+.wide-card {
+  min-height: 220px;
+}
+
 form {
   display: grid;
   gap: 12px;
   margin-bottom: 12px;
 }
 
-input, textarea {
+input, textarea, select {
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 10px;

@@ -24,6 +24,13 @@
           <a class="nav-item" href="#">WhatsApp</a>
           <a class="nav-item" href="#">Revenue</a>
         </nav>
+
+        <div class="auth-box">
+          <h4>Account</h4>
+          <input id="emailInput" value="tessy@sharksbot.ai" placeholder="Email" />
+          <button id="loginBtn">Sign in</button>
+          <p id="authStatus" class="status-text">Demo mode active</p>
+        </div>
       </aside>
 
       <main class="main-panel">
@@ -81,6 +88,31 @@
               <button type="submit">Search</button>
             </form>
             <pre id="spotifyResult"></pre>
+          </article>
+
+          <article class="card wide-card">
+            <h3>Create project</h3>
+            <form id="projectForm">
+              <input name="title" value="City Lights" />
+              <input name="genre" value="Afrobeats" />
+              <input name="mood" value="dreamy" />
+              <input name="bpm" type="number" value="96" />
+              <button type="submit">Save project</button>
+            </form>
+            <pre id="projectResult"></pre>
+          </article>
+
+          <article class="card wide-card">
+            <h3>Revenue checkout</h3>
+            <form id="checkoutForm">
+              <select name="plan">
+                <option value="starter">Starter</option>
+                <option value="growth" selected>Growth</option>
+                <option value="scale">Scale</option>
+              </select>
+              <button type="submit">Create checkout</button>
+            </form>
+            <pre id="checkoutResult"></pre>
           </article>
         </section>
       </main>
