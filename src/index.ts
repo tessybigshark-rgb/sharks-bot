@@ -9,7 +9,15 @@ import { createCheckoutSession } from './services/paymentService';
 import { getRevenueIdeas } from './services/revenueService';
 import { searchSpotifyTracks } from './services/spotifyService';
 import { handleIncomingWhatsAppMessage } from './services/whatsappService';
-import { addCampaign, addProject, addRevenuePlan, state } from './services/store';
+import { getAutomationStatus, triggerAutoOperations } from './services/automationService';
+import {
+  addCampaign,
+  addProject,
+  addRevenuePlan,
+  registerFeature,
+  state,
+  toggleFeature,
+} from './services/store';
 
 const router = Router();
 
@@ -161,6 +169,42 @@ router.post('/revenue/plans', (req: Request, res: Response) => {
   });
 
   return res.json({ success: true, data: plan });
+});
+
+router.get('/features', (_req: Request, res: Response) => {
+  res.json({ success: true, data: state.features });
+});
+
+router.post('/features', (req: Request, res: Response) => {
+  const payload = req.body ?? {};
+  const feature = registerFeature({
+    id: String(payload.id ?? `feature-${Date.now()}`),
+    name: String(payload.name ?? 'New feature'),
+    description: String(payload.description ?? 'Custom bot feature'),
+    category: (payload.category ?? 'automation') as 'music' | 'marketing' | 'automation' | 'analytics' | 'revenue' | 'system',
+    enabled: payload.enabled !== false,
+  });
+
+  return res.json({ success: true, data: feature });
+});
+
+router.patch('/features/:id/toggle', (req: Request, res: Response) => {
+  const payload = req.body ?? {};
+  const feature = toggleFeature(req.params.id, typeof payload.enabled === 'boolean' ? payload.enabled : undefined);
+
+  if (!feature) {
+    return res.status(404).json({ success: false, message: 'Feature not found' });
+  }
+
+  return res.json({ success: true, data: feature });
+});
+
+router.get('/automation/status', (_req: Request, res: Response) => {
+  res.json({ success: true, data: getAutomationStatus() });
+});
+
+router.post('/automation/run', (_req: Request, res: Response) => {
+  res.json({ success: true, data: triggerAutoOperations() });
 });
 
 export default router;
