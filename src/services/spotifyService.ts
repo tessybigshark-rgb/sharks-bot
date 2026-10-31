@@ -16,11 +16,11 @@ export type SocialCampaign = {
 };
 
 export function generateSocialCampaign(input: SocialRequest): SocialCampaign {
-  const artistName = input.artistName?.trim() || 'Sharks';
-  const songTitle = input.songTitle?.trim() || 'New Release';
-  const platform = input.platform?.trim() || 'Instagram';
-  const tone = input.tone?.trim() || 'confident';
-  const audience = input.audience?.trim() || 'music lovers';
+  const artistName = (input.artistName ?? 'Sharks').trim() || 'Sharks';
+  const songTitle = (input.songTitle ?? 'New Release').trim() || 'New Release';
+  const platform = (input.platform ?? 'Instagram').trim() || 'Instagram';
+  const tone = (input.tone ?? 'confident').trim() || 'confident';
+  const audience = (input.audience ?? 'music lovers').trim() || 'music lovers';
 
   const caption = `Fresh energy from ${artistName} with "${songTitle}". This one is built for ${audience}, designed to move the room and keep the vibe alive. Press play, share, and let the rhythm carry you. ${platform} is where the journey begins.`;
 
@@ -37,9 +37,9 @@ export function generateSocialCampaign(input: SocialRequest): SocialCampaign {
 
   const postingSchedule = [
     'Day 1: teaser clip',
-    'Day 2: lyrics/quote post',
+    'Day 2: lyrics or quote post',
     'Day 3: behind-the-scenes story',
-    'Day 4: release day caption + link',
+    'Day 4: release-day caption and link',
     'Day 5: fan engagement repost',
   ];
 
@@ -51,7 +51,7 @@ export function generateSocialCampaign(input: SocialRequest): SocialCampaign {
     'Turn the release into a mini challenge or trend',
   ];
 
-  const callToAction = `Stream "${songTitle}", save it, and tag someone who needs this feel in their playlist.`;
+  const callToAction = `Stream "${songTitle}", save it, and tag someone who needs this feeling in their playlist.`;
 
   return {
     caption,

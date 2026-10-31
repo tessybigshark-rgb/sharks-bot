@@ -29,12 +29,12 @@ export async function searchSpotifyTracks(seedGenres: string[], limit = 5): Prom
     const token = await spotifyApi.clientCredentialsGrant();
     spotifyApi.setAccessToken(token.body.access_token);
 
-    const recommendation = await spotifyApi.getRecommendations({
-      seed_genres: seedGenres.length ? seedGenres : ['afrobeat', 'dancehall'],
+    const recommendations = await spotifyApi.getRecommendations({
+      seed_genres: seedGenres.length > 0 ? seedGenres : ['afrobeat', 'dancehall'],
       limit,
     });
 
-    return (recommendation.body.tracks ?? []).map((track) => ({
+    return (recommendations.body.tracks ?? []).map((track) => ({
       id: track.id,
       name: track.name,
       artist: track.artists?.[0]?.name ?? 'Unknown artist',
@@ -42,10 +42,11 @@ export async function searchSpotifyTracks(seedGenres: string[], limit = 5): Prom
       genre: seedGenres[0] ?? 'mixed',
     }));
   } catch (error) {
-    console.error('Spotify integration failed. Using mock data instead.', error);
+    console.error('Spotify integration failed. Falling back to demo tracks.', error);
     return [
       { id: 'fallback-1', name: 'Night Drive', artist: 'Sharks', url: 'https://open.spotify.com', genre: 'lounge' },
       { id: 'fallback-2', name: 'Afterglow', artist: 'Nova Beam', url: 'https://open.spotify.com', genre: 'afrobeats' },
+      { id: 'fallback-3', name: 'Signal', artist: 'Echo Mode', url: 'https://open.spotify.com', genre: 'house' },
     ];
   }
 }

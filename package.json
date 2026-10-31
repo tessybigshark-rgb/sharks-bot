@@ -1,91 +1,39 @@
-# Sharks Bot
-
-Sharks Bot is an AI-powered music, social media, and revenue automation starter for creators, artists, and digital brands. It combines WhatsApp messaging, Spotify-style recommendations, AI social content creation, and monetization planning in a single platform.
-
-## Features
-- AI music prompt and playlist generation
-- WhatsApp message handling for music and content requests
-- Spotify recommendation layer with mock fallback
-- Social media content generator for Instagram, TikTok, X, and YouTube Shorts
-- Revenue planning ideas for subscriptions, affiliate deals, and brand packages
-- Dashboard summary endpoint and app health endpoint
-
-## Tech stack
-- Node.js
-- TypeScript
-- Express
-- Spotify Web API integration
-- OpenAI-ready service layer
-- Twilio WhatsApp-ready logic
-
-## Quick start
-
-1. Install dependencies:
-   npm install
-
-2. Copy environment variables:
-   cp .env.example .env
-
-3. Fill in the values you want to use.
-
-4. Start the dev server:
-   npm run dev
-
-5. Open the app:
-   http://localhost:4000
-
-## API overview
-
-- GET /health
-- GET /
-- POST /api/music/generate
-- POST /api/social/generate
-- POST /api/whatsapp/webhook
-- GET /api/revenue/ideas
-- POST /api/spotify/search
-
-## Example requests
-
-Generate a music brief:
-
-```bash
-curl -X POST http://localhost:4000/api/music/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "genre": "Afrobeats",
-    "mood": "happy",
-    "bpm": 110,
-    "audience": "young creators",
-    "usage": "opening track"
-  }'
-```
-
-Generate social content:
-
-```bash
-curl -X POST http://localhost:4000/api/social/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "artistName": "Sharks",
-    "songTitle": "Night Signal",
-    "platform": "Instagram",
-    "tone": "confident"
-  }'
-```
-
-Send a WhatsApp-style message:
-
-```bash
-curl -X POST http://localhost:4000/api/whatsapp/webhook \
-  -H "Content-Type: application/json" \
-  -d '{
-    "message": "Create a playlist for a late-night drive",
-    "senderName": "Kofi"
-  }'
-```
-
-## Notes
-This project is intentionally structured as a production-friendly starter. The integrations are implemented as service layers with mock fallback logic so the app works even before real API keys are configured.
-
-## License
-MIT
+{
+  "name": "sharks-bot",
+  "version": "1.0.0",
+  "description": "Sharks Bot — full-stack AI music, WhatsApp, social media, and monetization platform",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "music",
+    "whatsapp",
+    "spotify",
+    "social-media",
+    "ai",
+    "automation",
+    "sharks-bot"
+  ],
+  "author": "tessybigshark-rgb",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "openai": "^4.47.1",
+    "spotify-web-api-node": "^5.1.0",
+    "twilio": "^5.5.0",
+    "uuid": "^10.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.5",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

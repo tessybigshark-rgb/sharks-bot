@@ -1,6 +1,6 @@
 export type MusicBriefRequest = {
-  genre: string;
-  mood: string;
+  genre?: string;
+  mood?: string;
   bpm?: number;
   audience?: string;
   usage?: string;
@@ -22,12 +22,12 @@ export type MusicBrief = {
 };
 
 export function generateMusicBrief(input: MusicBriefRequest): MusicBrief {
-  const genre = input.genre?.trim() || 'Afrobeats';
-  const mood = input.mood?.trim() || 'uplifting';
-  const bpm = input.bpm ?? 100;
-  const audience = input.audience?.trim() || 'music lovers';
-  const usage = input.usage?.trim() || 'playlist opener';
-  const artistName = input.artistName?.trim() || 'Sharks';
+  const genre = (input.genre ?? 'Afrobeats').trim() || 'Afrobeats';
+  const mood = (input.mood ?? 'uplifting').trim() || 'uplifting';
+  const bpm = Number(input.bpm ?? 100);
+  const audience = (input.audience ?? 'music lovers').trim() || 'music lovers';
+  const usage = (input.usage ?? 'playlist opener').trim() || 'playlist opener';
+  const artistName = (input.artistName ?? 'Sharks').trim() || 'Sharks';
 
   const title = `${artistName} ${mood.charAt(0).toUpperCase() + mood.slice(1)} ${genre}`;
 
@@ -35,13 +35,10 @@ export function generateMusicBrief(input: MusicBriefRequest): MusicBrief {
 
   const productionNotes = [
     `Tempo locked at ${bpm} BPM`,
-    `Add subtle vocal chops and a memorable hook`,
-    `Mix for streaming platforms with strong low-end and clear vocals`,
+    'Add subtle vocal chops and a memorable hook',
+    'Mix for streaming platforms with strong low-end and clear vocals',
     `Keep energy balanced for ${usage}`,
   ];
-
-  const playlistName = `${artistName} ${mood} ${genre} Mix`;
-  const keywords = [genre, mood, 'streaming', 'playlist', 'hook', 'energy', audience];
 
   return {
     title,
@@ -53,7 +50,7 @@ export function generateMusicBrief(input: MusicBriefRequest): MusicBrief {
     description: `A ${genre} record designed to feel ${mood}, built for ${audience}, and optimized for ${usage}.`,
     prompt,
     productionNotes,
-    playlistName,
-    keywords,
+    playlistName: `${artistName} ${mood} ${genre} Mix`,
+    keywords: [genre, mood, 'streaming', 'playlist', 'hook', 'energy', audience],
   };
 }
