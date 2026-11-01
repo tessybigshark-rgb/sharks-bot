@@ -1,240 +1,222 @@
-export type AppUser = {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'creator' | 'fan';
-  createdAt: string;
-};
+import { Router, type Request, type Response } from 'express';
 
-export type MusicProject = {
-  id: string;
-  userId: string;
-  title: string;
-  genre: string;
-  mood: string;
-  bpm: number;
-  audience: string;
-  usage: string;
-  prompt: string;
-  status: 'draft' | 'ready' | 'published';
-  createdAt: string;
-};
+import { generateAIInsight } from './services/aiService';
+import { loginWithEmail, resolveAuthenticatedUser } from './services/authService';
+import { getDashboardSummary } from './services/analyticsService';
+import { generateMusicBrief } from './services/musicService';
+import { generateSocialCampaign } from './services/socialMediaService';
+import { createCheckoutSession } from './services/paymentService';
+import { getRevenueIdeas } from './services/revenueService';
+import { searchSpotifyTracks } from './services/spotifyService';
+import { handleIncomingWhatsAppMessage } from './services/whatsappService';
+import { getAutomationStatus, triggerAutoOperations } from './services/automationService';
+import {
+  addCampaign,
+  addProject,
+  addRevenuePlan,
+  registerFeature,
+  state,
+  toggleFeature,
+} from './services/store';
 
-export type SocialCampaign = {
-  id: string;
-  userId: string;
-  title: string;
-  platform: string;
-  tone: string;
-  caption: string;
-  hashtags: string[];
-  postingSchedule: string[];
-  createdAt: string;
-};
+const router = Router();
 
-export type RevenuePlan = {
-  id: string;
-  userId: string;
-  planName: string;
-  pricing: string;
-  channels: string[];
-  createdAt: string;
-};
-
-export type FeatureDefinition = {
-  id: string;
-  name: string;
-  description: string;
-  category: 'music' | 'marketing' | 'automation' | 'analytics' | 'revenue' | 'system';
-  enabled: boolean;
-  createdAt: string;
-};
-
-export type AppState = {
-  users: AppUser[];
-  projects: MusicProject[];
-  campaigns: SocialCampaign[];
-  revenuePlans: RevenuePlan[];
-  features: FeatureDefinition[];
-};
-
-export const state: AppState = {
-  users: [
-    {
-      id: 'user-1',
-      name: 'Tessy Shark',
-      email: 'tessy@sharksbot.ai',
-      role: 'admin',
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'user-2',
-      name: 'Kofi Creator',
-      email: 'kofi@creator.com',
-      role: 'creator',
-      createdAt: new Date().toISOString(),
-    },
-  ],
-  projects: [
-    {
-      id: 'project-1',
-      userId: 'user-1',
-      title: 'Night Signal',
-      genre: 'Afrobeats',
-      mood: 'confident',
-      bpm: 112,
-      audience: 'young creators',
-      usage: 'opening track',
-      prompt: 'Create a warm Afrobeats opening track with moody synths and a confident hook.',
-      status: 'ready',
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'project-2',
-      userId: 'user-2',
-      title: 'Midnight Mood',
-      genre: 'House',
-      mood: 'deep',
-      bpm: 118,
-      audience: 'night listeners',
-      usage: 'club intro',
-      prompt: 'Craft a rich house intro with subtle percussion and immersive atmosphere.',
-      status: 'draft',
-      createdAt: new Date().toISOString(),
-    },
-  ],
-  campaigns: [
-    {
-      id: 'campaign-1',
-      userId: 'user-1',
-      title: 'Launch campaign',
-      platform: 'Instagram',
-      tone: 'confident',
-      caption: 'Fresh energy is in the room. This is your signal to press play and share the moment.',
-      hashtags: ['#SharksBot', '#NewMusic', '#CreatorEconomy'],
-      postingSchedule: ['Day 1 teaser', 'Day 2 quote graphic', 'Day 4 release day'],
-      createdAt: new Date().toISOString(),
-    },
-  ],
-  revenuePlans: [
-    {
-      id: 'revenue-1',
-      userId: 'user-1',
-      planName: 'Creator Growth Pack',
-      pricing: '$49/month',
-      channels: ['Subscriptions', 'Affiliate tools', 'Brand sponsorships'],
-      createdAt: new Date().toISOString(),
-    },
-  ],
-  features: [
-    {
-      id: 'music-briefs',
-      name: 'Music Brief Generator',
-      description: 'Creates original song concepts, prompts, and production notes.',
-      category: 'music',
-      enabled: true,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'social-campaigns',
-      name: 'Social Campaign Builder',
-      description: 'Generates captions, hashtags, and scheduled social release plans.',
-      category: 'marketing',
-      enabled: true,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'spotify-discovery',
-      name: 'Spotify Discovery Layer',
-      description: 'Finds matching tracks by genre and audience mood for discovery workflows.',
-      category: 'automation',
-      enabled: true,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'whatsapp-automation',
-      name: 'WhatsApp Automation',
-      description: 'Handles incoming fan messages and turns them into content or music actions.',
-      category: 'automation',
-      enabled: true,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'ai-insights',
-      name: 'AI Growth Insights',
-      description: 'Produces strategic recommendations and growth ideas for creators.',
-      category: 'analytics',
-      enabled: true,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'monetization-plans',
-      name: 'Monetization Plans',
-      description: 'Tracks subscription offers and revenue routes for creator businesses.',
-      category: 'revenue',
-      enabled: true,
-      createdAt: new Date().toISOString(),
-    },
-  ],
-};
-
-export function getUserByEmail(email: string) {
-  return state.users.find((user) => user.email.toLowerCase() === email.toLowerCase()) ?? null;
+function asString(value: unknown): string {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
+  return '';
 }
 
-export function getUserById(id: string) {
-  return state.users.find((user) => user.id === id) ?? null;
+function asStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === 'string');
 }
 
-export function getFeatureById(id: string) {
-  return state.features.find((feature) => feature.id === id) ?? null;
-}
+router.get('/health', (_req: Request, res: Response) => {
+  res.json({ ok: true, status: 'healthy', app: 'Sharks Bot' });
+});
 
-export function addProject(project: Omit<MusicProject, 'id' | 'createdAt'>) {
-  const item: MusicProject = {
-    ...project,
-    id: `project-${Date.now()}`,
-    createdAt: new Date().toISOString(),
-  };
-  state.projects.unshift(item);
-  return item;
-}
+router.get('/dashboard/summary', (req: Request, res: Response) => {
+  const user = resolveAuthenticatedUser(req);
+  res.json({
+    success: true,
+    user,
+    data: getDashboardSummary(),
+  });
+});
 
-export function addCampaign(campaign: Omit<SocialCampaign, 'id' | 'createdAt'>) {
-  const item: SocialCampaign = {
-    ...campaign,
-    id: `campaign-${Date.now()}`,
-    createdAt: new Date().toISOString(),
-  };
-  state.campaigns.unshift(item);
-  return item;
-}
-
-export function addRevenuePlan(plan: Omit<RevenuePlan, 'id' | 'createdAt'>) {
-  const item: RevenuePlan = {
-    ...plan,
-    id: `revenue-${Date.now()}`,
-    createdAt: new Date().toISOString(),
-  };
-  state.revenuePlans.unshift(item);
-  return item;
-}
-
-export function registerFeature(feature: Omit<FeatureDefinition, 'createdAt'>) {
-  const item: FeatureDefinition = {
-    ...feature,
-    createdAt: new Date().toISOString(),
-  };
-  state.features.unshift(item);
-  return item;
-}
-
-export function toggleFeature(id: string, enabled?: boolean) {
-  const feature = getFeatureById(id);
-  if (!feature) {
-    return null;
+router.post('/auth/login', (req: Request, res: Response) => {
+  const email = asString(req.body?.email).trim();
+  if (!email) {
+    return res.status(400).json({ success: false, message: 'Email is required' });
   }
 
-  feature.enabled = enabled ?? !feature.enabled;
-  return feature;
-}
+  const user = loginWithEmail(email);
+  if (!user) {
+    return res.status(404).json({ success: false, message: 'No account found for that email' });
+  }
+
+  return res.json({ success: true, data: user });
+});
+
+router.get('/auth/me', (req: Request, res: Response) => {
+  const user = resolveAuthenticatedUser(req);
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Not authenticated' });
+  }
+  return res.json({ success: true, data: user });
+});
+
+router.get('/projects', (req: Request, res: Response) => {
+  const user = resolveAuthenticatedUser(req);
+  const projects = user ? state.projects.filter((project) => project.userId === user.id) : state.projects;
+  res.json({ success: true, data: projects });
+});
+
+router.post('/projects', (req: Request, res: Response) => {
+  const user = resolveAuthenticatedUser(req);
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Authentication required' });
+  }
+
+  const payload = (req.body ?? {}) as Record<string, unknown>;
+  const created = addProject({
+    userId: user.id,
+    title: asString(payload.title) || 'Untitled project',
+    genre: asString(payload.genre) || 'Afrobeats',
+    mood: asString(payload.mood) || 'uplifting',
+    bpm: Number(asString(payload.bpm) || 110),
+    audience: asString(payload.audience) || 'music lovers',
+    usage: asString(payload.usage) || 'playlist opener',
+    prompt: asString(payload.prompt) || 'Creative music brief',
+    status: 'draft',
+  });
+
+  return res.json({ success: true, data: created });
+});
+
+router.get('/campaigns', (req: Request, res: Response) => {
+  const user = resolveAuthenticatedUser(req);
+  const campaigns = user ? state.campaigns.filter((item) => item.userId === user.id) : state.campaigns;
+  res.json({ success: true, data: campaigns });
+});
+
+router.post('/campaigns', (req: Request, res: Response) => {
+  const user = resolveAuthenticatedUser(req);
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Authentication required' });
+  }
+
+  const payload = (req.body ?? {}) as Record<string, unknown>;
+  const created = addCampaign({
+    userId: user.id,
+    title: asString(payload.title) || 'Social campaign',
+    platform: asString(payload.platform) || 'Instagram',
+    tone: asString(payload.tone) || 'confident',
+    caption: asString(payload.caption) || 'Fresh energy is here.',
+    hashtags: asStringArray(payload.hashtags).length ? asStringArray(payload.hashtags) : ['#SharksBot'],
+    postingSchedule: asStringArray(payload.postingSchedule).length ? asStringArray(payload.postingSchedule) : ['Day 1 teaser'],
+  });
+
+  return res.json({ success: true, data: created });
+});
+
+router.post('/music/generate', (req: Request, res: Response) => {
+  const result = generateMusicBrief((req.body ?? {}) as Record<string, unknown>);
+  res.json({ success: true, data: result });
+});
+
+router.post('/social/generate', (req: Request, res: Response) => {
+  const result = generateSocialCampaign((req.body ?? {}) as Record<string, unknown>);
+  res.json({ success: true, data: result });
+});
+
+router.post('/spotify/search', async (req: Request, res: Response) => {
+  const payload = (req.body ?? {}) as Record<string, unknown>;
+  const seedGenres = Array.isArray(payload.seedGenres)
+    ? payload.seedGenres.filter((item): item is string => typeof item === 'string')
+    : ['afrobeats', 'dancehall'];
+
+  const tracks = await searchSpotifyTracks(seedGenres.length ? seedGenres : ['afrobeats', 'dancehall'], Number(payload.limit ?? 5));
+  res.json({ success: true, data: tracks });
+});
+
+router.post('/whatsapp/webhook', (req: Request, res: Response) => {
+  const payload = (req.body ?? {}) as Record<string, unknown>;
+  const result = handleIncomingWhatsAppMessage({
+    message: asString(payload.message),
+    senderName: asString(payload.senderName) || 'Fan',
+  });
+  res.json({ success: true, data: result });
+});
+
+router.get('/revenue/ideas', (_req: Request, res: Response) => {
+  res.json({ success: true, data: getRevenueIdeas() });
+});
+
+router.post('/revenue/checkout', (req: Request, res: Response) => {
+  const plan = asString(req.body?.plan) || 'growth';
+  const checkout = createCheckoutSession(plan);
+  res.json({ success: true, data: checkout });
+});
+
+router.post('/ai/insight', async (req: Request, res: Response) => {
+  const prompt = asString(req.body?.prompt) || 'Create a growth strategy for my music brand.';
+  const result = await generateAIInsight(prompt);
+  res.json({ success: true, data: result });
+});
+
+router.post('/revenue/plans', (req: Request, res: Response) => {
+  const user = resolveAuthenticatedUser(req);
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Authentication required' });
+  }
+
+  const payload = (req.body ?? {}) as Record<string, unknown>;
+  const plan = addRevenuePlan({
+    userId: user.id,
+    planName: asString(payload.planName) || 'Creator Growth Pack',
+    pricing: asString(payload.pricing) || '$49/month',
+    channels: asStringArray(payload.channels).length ? asStringArray(payload.channels) : ['Subscriptions'],
+  });
+
+  return res.json({ success: true, data: plan });
+});
+
+router.get('/features', (_req: Request, res: Response) => {
+  res.json({ success: true, data: state.features });
+});
+
+router.post('/features', (req: Request, res: Response) => {
+  const payload = (req.body ?? {}) as Record<string, unknown>;
+  const feature = registerFeature({
+    id: asString(payload.id) || `feature-${Date.now()}`,
+    name: asString(payload.name) || 'New feature',
+    description: asString(payload.description) || 'Custom bot feature',
+    category: (asString(payload.category) || 'automation') as 'music' | 'marketing' | 'automation' | 'analytics' | 'revenue' | 'system',
+    enabled: payload.enabled !== false,
+  });
+
+  return res.json({ success: true, data: feature });
+});
+
+router.patch('/features/:id/toggle', (req: Request, res: Response) => {
+  const payload = (req.body ?? {}) as Record<string, unknown>;
+  const feature = toggleFeature(req.params.id, typeof payload.enabled === 'boolean' ? payload.enabled : undefined);
+
+  if (!feature) {
+    return res.status(404).json({ success: false, message: 'Feature not found' });
+  }
+
+  return res.json({ success: true, data: feature });
+});
+
+router.get('/automation/status', (_req: Request, res: Response) => {
+  res.json({ success: true, data: getAutomationStatus() });
+});
+
+router.post('/automation/run', (_req: Request, res: Response) => {
+  res.json({ success: true, data: triggerAutoOperations() });
+});
+
+export default router;

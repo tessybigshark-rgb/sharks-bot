@@ -1,73 +1,52 @@
-import { generateMusicBrief } from './musicService';
-import { getRevenueIdeas } from './revenueService';
-import { generateSocialCampaign } from './socialMediaService';
+import SpotifyWebApi from 'spotify-web-api-node';
 
-export type WhatsappMessageInput = {
-  message: string;
-  senderName?: string;
+import { envConfig } from '../config/env';
+
+export type SpotifyRecommendation = {
+  id: string;
+  name: string;
+  artist: string;
+  url: string;
+  genre: string;
 };
 
-export function handleIncomingWhatsAppMessage(input: WhatsappMessageInput) {
-  const rawMessage = (input.message ?? '').trim();
-  const senderName = input.senderName ?? 'Creator';
-
-  if (!rawMessage) {
-    return {
-      senderName,
-      intent: 'help',
-      reply: 'Hi! I can help with music prompts, playlist ideas, content strategy, or monetization. Try: “create a playlist for a night drive” or “make a promo post”.',
-    };
+export async function searchSpotifyTracks(seedGenres: string[], limit = 5): Promise<SpotifyRecommendation[]> {
+  if (!envConfig.SPOTIFY_CLIENT_ID || !envConfig.SPOTIFY_CLIENT_SECRET) {
+    return [
+      { id: '1', name: 'Night Drive', artist: 'Sharks', url: 'https://open.spotify.com', genre: 'lounge' },
+      { id: '2', name: 'Afterglow', artist: 'Nova Beam', url: 'https://open.spotify.com', genre: 'afrobeats' },
+      { id: '3', name: 'Signal', artist: 'Echo Mode', url: 'https://open.spotify.com', genre: 'house' },
+    ];
   }
 
-  const lower = rawMessage.toLowerCase();
-
-  if (lower.includes('playlist') || lower.includes('song') || lower.includes('music')) {
-    const musicBrief = generateMusicBrief({
-      genre: lower.includes('afrobeats') ? 'Afrobeats' : lower.includes('house') ? 'House' : 'Afrobeats',
-      mood: lower.includes('late') || lower.includes('night') ? 'moody' : 'uplifting',
-      bpm: lower.includes('slow') ? 88 : 112,
-      audience: 'music lovers',
-      usage: 'playlist opener',
-      artistName: senderName,
+  try {
+    const spotifyApi = new SpotifyWebApi({
+      clientId: envConfig.SPOTIFY_CLIENT_ID,
+      clientSecret: envConfig.SPOTIFY_CLIENT_SECRET,
+      redirectUri: envConfig.SPOTIFY_REDIRECT_URI,
     });
 
-    return {
-      senderName,
-      intent: 'music',
-      reply: `Here is a music brief for ${senderName}: ${musicBrief.prompt} Playlist name: ${musicBrief.playlistName}.`,
-      data: musicBrief,
-    };
-  }
+    const token = await spotifyApi.clientCredentialsGrant();
+    spotifyApi.setAccessToken(token.body.access_token);
 
-  if (lower.includes('post') || lower.includes('caption') || lower.includes('promo') || lower.includes('social')) {
-    const campaign = generateSocialCampaign({
-      artistName: senderName,
-      songTitle: 'New Release',
-      platform: 'Instagram',
-      tone: 'confident',
+    const recommendations = await spotifyApi.getRecommendations({
+      seed_genres: seedGenres.length > 0 ? seedGenres : ['afrobeat', 'dancehall'],
+      limit,
     });
 
-    return {
-      senderName,
-      intent: 'social',
-      reply: `Social plan ready: ${campaign.caption}`,
-      data: campaign,
-    };
+    return (recommendations.body.tracks ?? []).map((track) => ({
+      id: track.id,
+      name: track.name,
+      artist: track.artists?.[0]?.name ?? 'Unknown artist',
+      url: track.external_urls?.spotify ?? 'https://open.spotify.com',
+      genre: seedGenres[0] ?? 'mixed',
+    }));
+  } catch (error) {
+    console.error('Spotify integration failed. Falling back to demo tracks.', error);
+    return [
+      { id: 'fallback-1', name: 'Night Drive', artist: 'Sharks', url: 'https://open.spotify.com', genre: 'lounge' },
+      { id: 'fallback-2', name: 'Afterglow', artist: 'Nova Beam', url: 'https://open.spotify.com', genre: 'afrobeats' },
+      { id: 'fallback-3', name: 'Signal', artist: 'Echo Mode', url: 'https://open.spotify.com', genre: 'house' },
+    ];
   }
-
-  if (lower.includes('money') || lower.includes('revenue') || lower.includes('monetize') || lower.includes('income')) {
-    const ideas = getRevenueIdeas();
-    return {
-      senderName,
-      intent: 'revenue',
-      reply: `Monetization ideas: ${ideas.primaryIdeas[0]} and ${ideas.primaryIdeas[1]}.`,
-      data: ideas,
-    };
-  }
-
-  return {
-    senderName,
-    intent: 'general',
-    reply: `Hey ${senderName}! I can help you generate music, playlists, social posts, or monetization ideas. Tell me what you want to build.`,
-  };
 }

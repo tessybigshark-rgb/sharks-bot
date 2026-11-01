@@ -8,11 +8,10 @@ export type CheckoutQuote = {
 
 export function createCheckoutSession(plan: string): CheckoutQuote {
   const normalizedPlan = plan.toLowerCase();
-  const amount = normalizedPlan === 'growth' ? 49 : 19;
 
   return {
     checkoutUrl: 'https://checkout.stripe.com/demo',
-    amount,
+    amount: normalizedPlan === 'growth' ? 49 : 19,
     currency: 'USD',
     status: 'ready',
     provider: 'stripe',
