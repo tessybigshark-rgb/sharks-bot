@@ -1,240 +1,74 @@
-export type AppUser = {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'creator' | 'fan';
-  createdAt: string;
+import { generateMusicBrief } from './musicService';
+import { getRevenueIdeas } from './revenueService';
+import { generateSocialCampaign } from './socialMediaService';
+
+export type WhatsappMessageInput = {
+  message: string;
+  senderName?: string;
 };
 
-export type MusicProject = {
-  id: string;
-  userId: string;
-  title: string;
-  genre: string;
-  mood: string;
-  bpm: number;
-  audience: string;
-  usage: string;
-  prompt: string;
-  status: 'draft' | 'ready' | 'published';
-  createdAt: string;
-};
+export function handleIncomingWhatsAppMessage(input: WhatsappMessageInput) {
+  const rawMessage = (input.message ?? '').trim();
+  const senderName = input.senderName ?? 'Creator';
 
-export type SocialCampaign = {
-  id: string;
-  userId: string;
-  title: string;
-  platform: string;
-  tone: string;
-  caption: string;
-  hashtags: string[];
-  postingSchedule: string[];
-  createdAt: string;
-};
-
-export type RevenuePlan = {
-  id: string;
-  userId: string;
-  planName: string;
-  pricing: string;
-  channels: string[];
-  createdAt: string;
-};
-
-export type FeatureDefinition = {
-  id: string;
-  name: string;
-  description: string;
-  category: 'music' | 'marketing' | 'automation' | 'analytics' | 'revenue';
-  enabled: boolean;
-  createdAt: string;
-};
-
-export type AppState = {
-  users: AppUser[];
-  projects: MusicProject[];
-  campaigns: SocialCampaign[];
-  revenuePlans: RevenuePlan[];
-  features: FeatureDefinition[];
-};
-
-export const state: AppState = {
-  users: [
-    {
-      id: 'user-1',
-      name: 'Tessy Shark',
-      email: 'tessy@sharksbot.ai',
-      role: 'admin',
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'user-2',
-      name: 'Kofi Creator',
-      email: 'kofi@creator.com',
-      role: 'creator',
-      createdAt: new Date().toISOString(),
-    },
-  ],
-  projects: [
-    {
-      id: 'project-1',
-      userId: 'user-1',
-      title: 'Night Signal',
-      genre: 'Afrobeats',
-      mood: 'confident',
-      bpm: 112,
-      audience: 'young creators',
-      usage: 'opening track',
-      prompt: 'Create a warm Afrobeats opening track with moody synths and a confident hook.',
-      status: 'ready',
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'project-2',
-      userId: 'user-2',
-      title: 'Midnight Mood',
-      genre: 'House',
-      mood: 'deep',
-      bpm: 118,
-      audience: 'night listeners',
-      usage: 'club intro',
-      prompt: 'Craft a rich house intro with subtle percussion and immersive atmosphere.',
-      status: 'draft',
-      createdAt: new Date().toISOString(),
-    },
-  ],
-  campaigns: [
-    {
-      id: 'campaign-1',
-      userId: 'user-1',
-      title: 'Launch campaign',
-      platform: 'Instagram',
-      tone: 'confident',
-      caption: 'Fresh energy is in the room. This is your signal to press play and share the moment.',
-      hashtags: ['#SharksBot', '#NewMusic', '#CreatorEconomy'],
-      postingSchedule: ['Day 1 teaser', 'Day 2 quote graphic', 'Day 4 release day'],
-      createdAt: new Date().toISOString(),
-    },
-  ],
-  revenuePlans: [
-    {
-      id: 'revenue-1',
-      userId: 'user-1',
-      planName: 'Creator Growth Pack',
-      pricing: '$49/month',
-      channels: ['Subscriptions', 'Affiliate tools', 'Brand sponsorships'],
-      createdAt: new Date().toISOString(),
-    },
-  ],
-  features: [
-    {
-      id: 'music-briefs',
-      name: 'Music Brief Generator',
-      description: 'Creates original song concepts, prompts, and production notes.',
-      category: 'music',
-      enabled: true,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'social-campaigns',
-      name: 'Social Campaign Builder',
-      description: 'Generates captions, hashtags, and scheduled social release plans.',
-      category: 'marketing',
-      enabled: true,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'spotify-discovery',
-      name: 'Spotify Discovery Layer',
-      description: 'Finds matching tracks by genre and audience mood for discovery workflows.',
-      category: 'automation',
-      enabled: true,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'whatsapp-automation',
-      name: 'WhatsApp Automation',
-      description: 'Handles incoming fan messages and turns them into content or music actions.',
-      category: 'automation',
-      enabled: true,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'ai-insights',
-      name: 'AI Growth Insights',
-      description: 'Produces strategic recommendations and growth ideas for creators.',
-      category: 'analytics',
-      enabled: true,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'monetization-plans',
-      name: 'Monetization Plans',
-      description: 'Tracks subscription offers and revenue routes for creator businesses.',
-      category: 'revenue',
-      enabled: true,
-      createdAt: new Date().toISOString(),
-    },
-  ],
-};
-
-export function getUserByEmail(email: string) {
-  return state.users.find((user) => user.email.toLowerCase() === email.toLowerCase()) ?? null;
-}
-
-export function getUserById(id: string) {
-  return state.users.find((user) => user.id === id) ?? null;
-}
-
-export function getFeatureById(id: string) {
-  return state.features.find((feature) => feature.id === id) ?? null;
-}
-
-export function addProject(project: Omit<MusicProject, 'id' | 'createdAt'>) {
-  const item: MusicProject = {
-    ...project,
-    id: `project-${Date.now()}`,
-    createdAt: new Date().toISOString(),
-  };
-  state.projects.unshift(item);
-  return item;
-}
-
-export function addCampaign(campaign: Omit<SocialCampaign, 'id' | 'createdAt'>) {
-  const item: SocialCampaign = {
-    ...campaign,
-    id: `campaign-${Date.now()}`,
-    createdAt: new Date().toISOString(),
-  };
-  state.campaigns.unshift(item);
-  return item;
-}
-
-export function addRevenuePlan(plan: Omit<RevenuePlan, 'id' | 'createdAt'>) {
-  const item: RevenuePlan = {
-    ...plan,
-    id: `revenue-${Date.now()}`,
-    createdAt: new Date().toISOString(),
-  };
-  state.revenuePlans.unshift(item);
-  return item;
-}
-
-export function registerFeature(feature: Omit<FeatureDefinition, 'createdAt'>) {
-  const item: FeatureDefinition = {
-    ...feature,
-    createdAt: new Date().toISOString(),
-  };
-  state.features.unshift(item);
-  return item;
-}
-
-export function toggleFeature(id: string, enabled?: boolean) {
-  const feature = getFeatureById(id);
-  if (!feature) {
-    return null;
+  if (!rawMessage) {
+    return {
+      senderName,
+      intent: 'help',
+      reply: 'Hi! I can help with music prompts, playlist ideas, content strategy, or monetization. Try: “create a playlist for a night drive” or “make a promo post”.',
+    };
   }
 
-  feature.enabled = enabled ?? !feature.enabled;
-  return feature;
+  const lower = rawMessage.toLowerCase();
+
+  if (lower.includes('playlist') || lower.includes('song') || lower.includes('music')) {
+    const musicBrief = generateMusicBrief({
+      genre: lower.includes('afrobeats') ? 'Afrobeats' : lower.includes('house') ? 'House' : 'Afrobeats',
+      mood: lower.includes('late') || lower.includes('night') ? 'moody' : 'uplifting',
+      bpm: lower.includes('slow') ? 88 : 112,
+      audience: 'music lovers',
+      usage: 'playlist opener',
+      artistName: senderName,
+    });
+
+    return {
+      senderName,
+      intent: 'music',
+      reply: `Here is a music brief for ${senderName}: ${musicBrief.prompt} Playlist name: ${musicBrief.playlistName}.`,
+      data: musicBrief,
+    };
+  }
+
+  if (lower.includes('post') || lower.includes('caption') || lower.includes('promo') || lower.includes('social')) {
+    const campaign = generateSocialCampaign({
+      artistName: senderName,
+      songTitle: 'New Release',
+      platform: 'Instagram',
+      tone: 'confident',
+    });
+
+    return {
+      senderName,
+      intent: 'social',
+      reply: `Social plan ready: ${campaign.caption}`,
+      data: campaign,
+    };
+  }
+
+  if (lower.includes('money') || lower.includes('revenue') || lower.includes('monetize') || lower.includes('income')) {
+    const ideas = getRevenueIdeas();
+    return {
+      senderName,
+      intent: 'revenue',
+      reply: `Monetization ideas: ${ideas.primaryIdeas[0]} and ${ideas.primaryIdeas[1]}.`,
+      data: ideas,
+    };
+  }
+
+  return {
+    senderName,
+    intent: 'general',
+    reply: `Hey ${senderName}! I can help you generate music, playlists, social posts, or monetization ideas. Tell me what you want to build.`,
+  };
 }
+

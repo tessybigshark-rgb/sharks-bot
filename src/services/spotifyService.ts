@@ -22,8 +22,7 @@ export function generateSocialCampaign(input: SocialRequest): SocialCampaign {
   const tone = (input.tone ?? 'confident').trim() || 'confident';
   const audience = (input.audience ?? 'music lovers').trim() || 'music lovers';
 
-  const caption = `Fresh energy from ${artistName} with "${songTitle}". This one is built for ${audience}, designed to move the room and keep the vibe alive. Press play, share, and let the rhythm carry you. ${platform} is where the journey begins.`;
-
+  const caption = `Fresh energy from ${artistName} with "${songTitle}". This one is built for ${audience}, designed to move the room and keep the vibe alive. Press play, share, and let the rhythm speak for itself on ${platform}.`;
   const hook = `This is the sound of ${artistName} showing up louder.`;
 
   const hashtags = [
@@ -62,3 +61,4 @@ export function generateSocialCampaign(input: SocialRequest): SocialCampaign {
     callToAction,
   };
 }
+
