@@ -1,0 +1,13 @@
+services:
+  sharks-bot:
+    build:
+      context: .
+    container_name: sharks-bot
+    ports:
+      - "${PORT:-4000}:${PORT:-4000}"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: ${PORT:-4000}
+    restart: unless-stopped
