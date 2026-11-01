@@ -19,6 +19,10 @@ import {
   toggleFeature,
 } from './services/store';
 
+declare const input: unknown[] | undefined;
+
+const value = Array.isArray(input) ? input[0] : undefined;
+
 const router = Router();
 
 router.get('/health', (_req: Request, res: Response) => {
