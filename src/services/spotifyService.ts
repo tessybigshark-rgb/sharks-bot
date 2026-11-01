@@ -61,4 +61,3 @@ export function generateSocialCampaign(input: SocialRequest): SocialCampaign {
     callToAction,
   };
 }
-

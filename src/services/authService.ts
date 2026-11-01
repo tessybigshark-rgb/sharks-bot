@@ -17,4 +17,3 @@ export function getDashboardSummary(): DashboardSummary {
     status: 'healthy',
   };
 }
-

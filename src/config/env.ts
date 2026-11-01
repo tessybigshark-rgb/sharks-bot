@@ -238,4 +238,3 @@ export function toggleFeature(id: string, enabled?: boolean) {
   feature.enabled = enabled ?? !feature.enabled;
   return feature;
 }
-

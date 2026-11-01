@@ -18,4 +18,3 @@ export function createCheckoutSession(plan: string): CheckoutQuote {
     provider: 'stripe',
   };
 }
-

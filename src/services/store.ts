@@ -71,4 +71,3 @@ export function handleIncomingWhatsAppMessage(input: WhatsappMessageInput) {
     reply: `Hey ${senderName}! I can help you generate music, playlists, social posts, or monetization ideas. Tell me what you want to build.`,
   };
 }
-

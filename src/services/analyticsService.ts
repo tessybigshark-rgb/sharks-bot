@@ -194,4 +194,3 @@ export async function generateAIInsight(prompt: string): Promise<AIResponse> {
     };
   }
 }
-

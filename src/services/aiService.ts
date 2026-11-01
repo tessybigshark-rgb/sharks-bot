@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from 'express';
 
 import { generateAIInsight } from './services/aiService';
-import { resolveAuthenticatedUser, loginWithEmail } from './services/authService';
+import { loginWithEmail, resolveAuthenticatedUser } from './services/authService';
 import { getDashboardSummary } from './services/analyticsService';
 import { generateMusicBrief } from './services/musicService';
 import { generateSocialCampaign } from './services/socialMediaService';
@@ -28,10 +28,8 @@ function asString(value: unknown): string {
 }
 
 function asStringArray(value: unknown): string[] {
-  if (Array.isArray(value)) {
-    return value.filter((item): item is string => typeof item === 'string');
-  }
-  return [];
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === 'string');
 }
 
 router.get('/health', (_req: Request, res: Response) => {
@@ -87,7 +85,7 @@ router.post('/projects', (req: Request, res: Response) => {
     title: asString(payload.title) || 'Untitled project',
     genre: asString(payload.genre) || 'Afrobeats',
     mood: asString(payload.mood) || 'uplifting',
-    bpm: Number(asString(payload.bpm)) || 110,
+    bpm: Number(asString(payload.bpm) || 110),
     audience: asString(payload.audience) || 'music lovers',
     usage: asString(payload.usage) || 'playlist opener',
     prompt: asString(payload.prompt) || 'Creative music brief',
@@ -222,4 +220,3 @@ router.post('/automation/run', (_req: Request, res: Response) => {
 });
 
 export default router;
-
