@@ -1,97 +1,21 @@
-# Sharks Bot
+import dotenv from 'dotenv';
 
-Sharks Bot is a full-stack AI music, WhatsApp, Spotify, and social media automation platform for creators, artists, and digital brands. It helps manage music generation, playlist recommendation, campaign content, communication flows, and monetization ideas in one place.
+dotenv.config();
 
-## Features
-- AI music brief generation
-- WhatsApp message automation
-- Spotify recommendation search layer
-- Social media content generation
-- Revenue and subscription planning
-- Dashboard UI for testing the app
+export const envConfig = {
+  PORT: Number(process.env.PORT ?? 4000),
+  NODE_ENV: process.env.NODE_ENV ?? 'development',
+  APP_NAME: process.env.APP_NAME ?? 'Sharks Bot',
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? '',
+  SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID ?? '',
+  SPOTIFY_CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET ?? '',
+  SPOTIFY_REDIRECT_URI: process.env.SPOTIFY_REDIRECT_URI ?? 'http://localhost:4000/callback',
+  WHATSAPP_TOKEN: process.env.WHATSAPP_TOKEN ?? '',
+  TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID ?? '',
+  TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN ?? '',
+  TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER ?? '',
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ?? '',
+  STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET ?? '',
+};
 
-## Tech stack
-- Node.js
-- TypeScript
-- Express
-- Static front-end dashboard
-- Spotify API-ready service layer
-- Twilio-ready WhatsApp workflow
-
-## Quick start
-
-1. Install dependencies:
-   npm install
-
-2. Set environment variables:
-   cp .env.example .env
-
-3. Start the app in development mode:
-   npm run dev
-
-4. Open the dashboard:
-   http://localhost:4000
-
-## Available API routes
-
-- GET /health
-- GET /api/dashboard/summary
-- POST /api/music/generate
-- POST /api/social/generate
-- POST /api/spotify/search
-- POST /api/whatsapp/webhook
-- GET /api/revenue/ideas
-
-## Example requests
-
-Generate a music brief:
-
-```bash
-curl -X POST http://localhost:4000/api/music/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "genre": "Afrobeats",
-    "mood": "happy",
-    "bpm": 110,
-    "audience": "young creators",
-    "usage": "opening track"
-  }'
-```
-
-Generate social content:
-
-```bash
-curl -X POST http://localhost:4000/api/social/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "artistName": "Sharks",
-    "songTitle": "Night Signal",
-    "platform": "Instagram",
-    "tone": "confident"
-  }'
-```
-
-Search Spotify recommendations:
-
-```bash
-curl -X POST http://localhost:4000/api/spotify/search \
-  -H "Content-Type: application/json" \
-  -d '{
-    "seedGenres": ["afrobeats", "dancehall"],
-    "limit": 3
-  }'
-```
-
-Process a WhatsApp message:
-
-```bash
-curl -X POST http://localhost:4000/api/whatsapp/webhook \
-  -H "Content-Type: application/json" \
-  -d '{
-    "message": "Create a playlist for a late-night drive",
-    "senderName": "Kofi"
-  }'
-```
-
-## Notes
-This repository is a strong starter foundation for a real business product. The service layer is structured to allow easy integration with real AI, Spotify, WhatsApp, and Stripe APIs when you are ready.
+export const isProduction = envConfig.NODE_ENV === 'production';
